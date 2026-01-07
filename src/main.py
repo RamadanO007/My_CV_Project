@@ -170,10 +170,10 @@ class AutomationWorkflow:
             # Initialize automation controller
             self.controller = AutomationController(
                 move_duration=0.5,
-                type_interval=0.1, 
+                type_interval=0.14, 
                 window_timeout=5
             )
-            
+
             logger.info("✓ All components initialized successfully")
             return True
             

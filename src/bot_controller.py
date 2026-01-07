@@ -23,7 +23,7 @@ class AutomationController:
     def __init__(
         self,
         move_duration: float = 0.5,
-        type_interval: float = 0.01,
+        type_interval: float = 0.05,
         window_timeout: int = 5
     ):
         """
@@ -78,14 +78,14 @@ class AutomationController:
             new_y = icon_y
             
             if icon_x < mid_x:  # Left half
-                new_x = icon_x + 150
+                new_x = icon_x + 480
             else:  # Right half
-                new_x = icon_x - 150
+                new_x = icon_x - 480
             
             if icon_y < mid_y:  # Upper half
-                new_y = icon_y + 150
+                new_y = icon_y + 270
             else:  # Lower half
-                new_y = icon_y - 150
+                new_y = icon_y - 270
             
             logger.debug(f"Moving mouse away to ({new_x}, {new_y})")
             pyautogui.moveTo(new_x, new_y, duration=0.2)
@@ -240,6 +240,10 @@ class AutomationController:
                 time.sleep(0.5)
                 if filepath.exists():
                     logger.info(f"✓ File saved successfully: {filepath}")
+                    # Click to clear any dialogs or focus issues
+                    time.sleep(0.2)
+                    pyautogui.click()
+                    logger.debug("Clicked after save")
                     return True
                 logger.debug(f"Verification attempt {attempt + 1}/3: File not found yet")
             
@@ -284,19 +288,43 @@ class AutomationController:
             # Close window (Alt+F4)
             logger.debug("Sending Alt+F4 to close window")
             pyautogui.hotkey('alt', 'F4')
-            time.sleep(0.5)
+            time.sleep(1.0)  # Increased wait for close/prompt dialog
             
             # Handle save changes prompt if appears
-            unsaved_windows = gw.getWindowsWithTitle("Notepad")
-            if unsaved_windows:
+            # Check for actual save prompt dialog, not just any Notepad window
+            prompt_detected = False
+            try:
+                # Look for the save changes dialog specifically
+                all_windows = gw.getAllTitles()
+                for title in all_windows:
+                    if "Notepad" in title and ("want to save" in title.lower() or title == "Notepad"):
+                        # Additional check: if there's still a Notepad window after Alt+F4, it's likely a prompt
+                        notepad_windows_after = gw.getWindowsWithTitle("Notepad")
+                        if notepad_windows_after:
+                            prompt_detected = True
+                            break
+            except Exception as e:
+                logger.debug(f"Error checking for save prompt: {e}")
+            
+            if prompt_detected:
                 logger.debug("Save changes prompt detected")
+                time.sleep(0.2)  # Small delay before responding to prompt
                 if save_changes:
                     logger.debug("Pressing 'Y' to save changes")
                     pyautogui.press('y')
+
+                    time.sleep(0.3)
+                    pyautogui.click()
+                    logger.debug("Clicked after accepting save prompt")
                 else:
                     logger.debug("Pressing 'N' to discard changes")
                     pyautogui.press('n')
-                time.sleep(0.3)
+                    time.sleep(0.3)
+                    pyautogui.click()
+                    logger.debug("Clicked after dismissing save prompt")
+                time.sleep(0.5)
+            else:
+                logger.debug("No save prompt detected, window closed cleanly")
             
             # Verify window closed
             time.sleep(0.3)
