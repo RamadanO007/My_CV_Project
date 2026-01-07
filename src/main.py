@@ -159,7 +159,7 @@ class AutomationWorkflow:
             self.detector = IconDetector(
                 template_path=self.template_path,
                 template_confidence=0.85,
-                ocr_confidence=0.6,
+                ocr_confidence=0.65,
                 target_name="notepad",
                 max_retries=3
             )

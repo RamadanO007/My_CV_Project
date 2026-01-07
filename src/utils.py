@@ -211,9 +211,10 @@ def calculate_text_similarity(detected_text: str, target: str = "Notepad") -> fl
     """
     Calculate similarity score between detected text and target.
     
-    Implements fuzzy matching algorithm:
+    Implements fuzzy matching algorithm with word boundary enforcement:
     - Exact match: 1.0
-    - Starts with target: 0.6-0.8 (length-adjusted)
+    - Starts with target + word boundary: 0.6-0.8 (length-adjusted)
+    - Starts with target + no boundary (e.g., "Notepad++"): 0.3-0.4
     - Contains target (word boundary): 0.6
     - Contains target (substring): 0.4
     - No match: 0.0
@@ -235,8 +236,20 @@ def calculate_text_similarity(detected_text: str, target: str = "Notepad") -> fl
     if text_lower == target_lower:
         return 1.0
     
-    # Starts with target
+    # Starts with target - check word boundary
     if text_lower.startswith(target_lower):
+        # Check if there are extra characters after target
+        next_char_idx = len(target_lower)
+        if next_char_idx < len(text_lower):
+            next_char = text_lower[next_char_idx]
+            # If next char is NOT a space/separator, it's likely a different app
+            # (e.g., "Notepad++" should not match "Notepad")
+            if next_char not in (' ', '\t', '\n'):
+                # Weak match for extended names
+                length_ratio = len(target_lower) / len(text_lower)
+                return 0.3 + (0.1 * length_ratio)
+        
+        # Word boundary exists or target is at end - strong match
         length_ratio = len(target_lower) / len(text_lower)
         return 0.6 + (0.2 * length_ratio)
     
