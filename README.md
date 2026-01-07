@@ -184,50 +184,24 @@ NUM_POSTS = 10                  # Posts to process
 
 ## 📊 Logging
 
-The application provides comprehensive logging:
-
-- **Console Output**: INFO level messages with progress indicators
-- **Log File**: `automation.log` with DEBUG level details
-- **Annotated Screenshots**: Visual debugging in `detection_screenshots/`
-
-### Sample Log Output
+Comprehensive logging with detection method tracking:
 
 ```
-============================================================
-STARTING AUTOMATION WORKFLOW
-============================================================
-
-INFO - Initializing components...
-INFO - ✓ All components initialized successfully
-INFO - Fetching posts from API...
-INFO - ✓ Successfully processed 10 valid posts
-
-============================================================
-PROCESSING POST 1/10: Post(id=1, title='sunt aut facere repellat pr...')
-============================================================
-
-INFO - Step 1: Detecting Notepad icon...
-INFO - ✓ Icon detected at (1456, 234)
-INFO - Step 2: Launching Notepad...
-INFO - ✓ Notepad launched
-INFO - Step 3: Typing post content...
-INFO - ✓ Content typed
-INFO - Step 4: Saving file...
-INFO - ✓ File saved: Desktop/cv-project/tjm/post_1.txt
-INFO - Step 5: Closing Notepad...
-INFO - ✓ Notepad closed
-INFO - ✓ Post 1 completed successfully
+INFO - High confidence (0.98) with 2 candidates detected, performing OCR verification...
+INFO - ✓ OCR verification successful: Selected 'Notepad' - DetectionResult(center=(1456, 234), confidence=0.92, method=template+ocr)
+INFO - ✓ Notepad launched successfully
 ```
 
-## 🧪 Testing Recommendations
+- **Console**: INFO level with progress
+- **File**: `automation.log` with DEBUG details
+- **Screenshots**: Visual debugging in `detection_screenshots/`
 
-Test icon detection in different positions:
+## 🧪 Testing
 
-1. **Top-left corner** - Move Notepad icon to top-left area
-2. **Center screen** - Move icon to middle of desktop
-3. **Bottom-right corner** - Move icon to bottom-right area
-
-Run the application after each position change to verify detection works.
+Test with different icon positions:
+1. **Multiple similar icons**: Place both Notepad and Notepad++ on desktop → System uses OCR to select correct one
+2. **Various positions**: Top-left, center, bottom-right → Detects in all locations
+3. **High confidence scenarios**: Single icon → Fast template matching without OCR overhead
 
 ## ⚠️ Troubleshooting
 
@@ -258,79 +232,42 @@ Run the application after each position change to verify detection works.
 
 ## 🔬 Technical Details
 
-### Template Matching Algorithm
+### Template Matching
+- **Algorithm**: Normalized cross-correlation (`cv2.TM_CCOEFF_NORMED`)
+- **Multi-scale**: [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.8, 2.0, 2.5, 3.0]
+- **Multiple instance detection**: Finds all matches above threshold using `np.where()`
+- **Deduplication**: Groups nearby detections (20% template size) and across scales (50px)
 
-Uses **normalized cross-correlation** (`cv2.TM_CCOEFF_NORMED`):
-
-```python
-result = cv2.matchTemplate(screenshot_gray, template, cv2.TM_CCOEFF_NORMED)
+### OCR Pipeline
+```
+Grayscale → Bilateral filter (9,75,75) → CLAHE (2.0, 8x8) → Otsu's threshold → PIL Image → Tesseract PSM 11
 ```
 
-Multi-scale search handles different icon sizes:
-- Scales: [0.5, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.8, 2.0, 2.5]
-- Returns best match across all scales
-
-### OCR Preprocessing Pipeline
-
-```python
-1. Grayscale conversion          # Reduce to single channel
-2. Bilateral filter (9, 75, 75)  # Denoise while preserving edges
-3. CLAHE (2.0, 8x8)              # Enhance local contrast
-4. Otsu's thresholding           # Automatic binarization
-```
-
-### Text Similarity Scoring
-
-Fuzzy matching algorithm for "notepad":
+### Text Matching
 - **Exact match**: 1.0
-- **Starts with "notepad"**: 0.6-0.8 (length-adjusted)
-- **Contains "notepad" (word boundary)**: 0.6
-- **Contains "notepad" (substring)**: 0.4
-- **No match**: 0.0
-
-Combined score: `(similarity * 0.7) + (ocr_confidence * 0.3)`
+- **Starts with + word boundary**: 0.6-0.8
+- **Starts with + no boundary** (e.g., "Notepad++"): 0.3-0.4
+- **Contains (word boundary)**: 0.6
+- **Score**: 90% text similarity + 10% OCR confidence
 
 ## 🚀 Advanced Usage
 
-### Custom Icon Detection
-
-Modify main.py to detect different icons:
-
+### Detect Different Icons
 ```python
 detector = IconDetector(
     template_path=Path("assets/chrome_icon.png"),
-    target_name="chrome",  # For OCR fallback
-    template_confidence=1.01,
-    ocr_confidence=0.6
+    target_name="chrome",
+    template_confidence=0.85
 )
 ```
 
-### Adjust Detection Parameters
-
+### Adjust Detection Sensitivity
 ```python
-# More lenient detection
-detector = IconDetector(
-    template_confidence=0.75,  # Lower threshold
-    ocr_confidence=0.5,
-    max_retries=5              # More attempts
-)
+# More lenient
+detector = IconDetector(template_confidence=0.75, max_retries=5)
 
-# Stricter detection
-detector = IconDetector(
-    template_confidence=0.90,  # Higher threshold
-    ocr_confidence=0.7,
-    max_retries=2
-)
-```
-
-### Process More/Fewer Posts
-
-```python
-workflow = AutomationWorkflow(
-    template_path=TEMPLATE_PATH,
-    output_dir=OUTPUT_DIR,
-    num_posts=20  # Process 20 posts instead of 10
-)
+# Stricter
+detector = IconDetector(template_confidence=0.90, ocr_confidence=0.7)
 ```
 
 ## 📚 Dependencies
@@ -350,14 +287,11 @@ Optional:
 
 ## 🤝 Contributing
 
-Suggestions for improvements:
-
-1. **Multi-resolution support** - Adapt to different screen resolutions
-2. **Template auto-generation** - Extract icons programmatically
-3. **Machine learning detection** - Use YOLO/CNN for robust detection
-4. **Cross-platform support** - Extend to macOS and Linux
-5. **GUI interface** - Add visual configuration and monitoring
-6. **Performance metrics** - Track detection speed and accuracy
+Improvement suggestions:
+- Multi-resolution support for different DPI settings
+- Machine learning detection (YOLO/CNN)
+- Cross-platform support (macOS/Linux)
+- GUI configuration interface
 
 ## 📄 License
 
@@ -372,26 +306,22 @@ This project is licensed under the MIT License.
 
 ## 📞 Support
 
-For issues or questions:
-
-1. Check the troubleshooting section
-2. Review log file (`automation.log`)
+For issues:
+1. Check troubleshooting section above
+2. Review `automation.log`
 3. Inspect debug screenshots in `detection_screenshots/`
-4. Verify template image matches your desktop icon
+4. Verify template matches your desktop icon
 
-## 🎓 Educational Value
+## 🎓 Key Concepts
 
 This project demonstrates:
-
-- **Computer Vision**: Template matching, image preprocessing, multi-scale detection
-- **OCR Integration**: Text recognition, preprocessing pipelines
-- **Desktop Automation**: GUI interaction, window management
-- **Software Engineering**: Modular design, error handling, logging
-- **API Integration**: RESTful API consumption, data validation
-- **Production Practices**: Retry logic, validation, comprehensive logging
-
-Perfect for portfolio showcases, learning CV/automation, or extending into production tools!
+- **Multi-instance detection** with OpenCV template matching
+- **OCR ambiguity resolution** for similar icons
+- **Adaptive cursor management** to prevent detection obstruction
+- **Word boundary text matching** for precise label identification
+- **Production-grade error handling** and logging
+- **Modular architecture** with separation of concerns
 
 ---
 
-**Built with ❤️ for robust desktop automation**
+**Built for robust desktop automation with intelligent icon detection**
