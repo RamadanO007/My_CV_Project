@@ -4,30 +4,35 @@
 [![OpenCV](https://img.shields.io/badge/opencv-4.8%2B-green.svg)](https://opencv.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A production-ready Python application that uses **computer vision** and **OCR** to dynamically locate and interact with desktop icons on Windows. The system robustly finds target icons (e.g., Notepad) regardless of their desktop position, enabling reliable automation even when icon layouts change.
+Python automation system using **computer vision** and **OCR** to locate and interact with desktop icons on Windows. Reliably finds target icons (e.g., Notepad) regardless of desktop position or similar icons nearby.
 
 ## 🎯 Key Features
 
-- **🔍 Dual Detection Strategy**
-  - Primary: Multi-scale template matching (0.5x - 2.5x) with OpenCV
-  - Fallback: OCR-based text detection with Pytesseract
-  - 90%+ detection success rate across different positions
+- **🔍 Smart Detection Strategy**
+  - Primary: Multi-scale template matching (0.7x - 3.0x) with OpenCV
+  - Multiple instance detection (finds all matching icons simultaneously)
+  - **Intelligent OCR fallback** triggers when:
+    - Template matching fails completely
+    - Multiple similar icons detected (e.g., Notepad vs Notepad++)
+    - High confidence (≥0.91) with multiple candidates present
+    - Ambiguous matches within 0.1 confidence of each other
+  - OCR verifies by matching text labels to ensure correct icon selection
 
-- **🖼️ Advanced Image Preprocessing**
-  - Bilateral filtering for noise reduction
-  - CLAHE for contrast enhancement
-  - Otsu's thresholding for optimal binarization
+- **🖼️ Image Processing Pipeline**
+  - Bilateral filtering + CLAHE + Otsu's thresholding
+  - Word boundary checking for exact text matches
+  - 90% similarity weight for text matching vs 10% OCR confidence
 
-- **🤖 Desktop Automation**
-  - Mouse control and keyboard input with PyAutoGUI
-  - Window management with PyGetWindow
-  - File dialog navigation and handling
+- **🤖 Robust Desktop Automation**
+  - Intelligent mouse positioning (moves away after click to prevent obstruction)
+  - Adaptive cursor placement based on screen quadrant
+  - Click-to-clear hover effects for consistent detection
+  - Window management and file dialog navigation
 
-- **📊 Production-Ready Architecture**
-  - Modular design with clear separation of concerns
-  - Comprehensive logging (console + file)
-  - Robust error handling and retry mechanisms
+- **📊 Production-Ready**
+  - Comprehensive logging with detection method tracking
   - Visual debugging with annotated screenshots
+  - Retry mechanisms and error handling
 
 ## 📁 Project Structure
 
@@ -108,31 +113,31 @@ python main.py
 
 ### Detection Pipeline
 
-1. **Screenshot Capture**: Captures full desktop screenshot
-2. **Template Matching** (Primary Method):
-   - Searches for icon at multiple scales (0.5x to 2.5x)
-   - Uses normalized cross-correlation
-   - Returns best match if confidence > 1.01
+1. **Screenshot Capture**: Full desktop screenshot
+2. **Template Matching** (Primary):
+   - Multi-scale search (0.7x to 3.0x) using normalized cross-correlation
+   - Detects **all instances** above confidence threshold (0.85)
+   - Non-maximum suppression to avoid duplicates
+   - Cross-scale deduplication (merges same icon at different scales)
 
-3. **OCR Fallback** (If template fails):
-   - Preprocesses image for optimal OCR
-   - Runs Tesseract with PSM 11 (sparse text mode)
-   - Finds text labels matching "notepad"
-   - Estimates icon position from text location
-   - Returns best candidate if score > 0.6
+3. **OCR Verification** (Triggered When):
+   - **Scenario 1**: Template matching completely fails → Full OCR fallback
+   - **Scenario 2**: Multiple icons detected with high confidence (≥0.91) → OCR disambiguates
+   - **Scenario 3**: Ambiguous matches (within 0.1 confidence) → OCR verifies text labels
+   - Uses Tesseract PSM 11 (sparse text mode) with preprocessing
+   - Matches text labels with word boundary checking (90% text similarity + 10% OCR confidence)
+   - Returns icon with exact text match (e.g., "Notepad" vs "Notepad++")
 
-4. **Validation**: Checks coordinates are within screen bounds
+4. **Smart Click Handling**:
+   - Double-clicks icon
+   - **Moves mouse away** based on screen quadrant (50-150px offset)
+   - Single click at new position to clear hover effects
+   - Prevents cursor from obstructing subsequent detections
 
 ### Automation Workflow
 
-For each post from the API:
-
-1. **Detect Icon**: Find Notepad icon on desktop
-2. **Launch Application**: Double-click icon coordinates
-3. **Wait for Window**: Verify Notepad window opened
-4. **Type Content**: Clear existing text and type post data
-5. **Save File**: Navigate Save As dialog and save
-6. **Close Application**: Close Notepad window
+For each API post:
+1. Detect icon → 2. Launch app → 3. Wait for window → 4. Type content → 5. Save file → 6. Close app
 
 ## 🎨 Output
 
@@ -167,24 +172,14 @@ nostrum rerum est autem sunt rem eveniet architecto
 
 ## 🔧 Configuration
 
-Key parameters can be adjusted in main.py:
+Key parameters in `main.py`:
 
 ```python
-# Detection confidence thresholds
-template_confidence = 1.01  # Template matching threshold
-ocr_confidence = 0.6        # OCR detection threshold
-
-# Automation timing
-move_duration = 0.5         # Mouse movement speed (seconds)
-type_interval = 0.01        # Typing speed (seconds per char)
-window_timeout = 5          # Window detection timeout (seconds)
-
-# Retry behavior
-max_retries = 3             # Detection retry attempts
-retry_delay = 1.0           # Delay between retries (seconds)
-
-# Processing
-NUM_POSTS = 10              # Number of posts to process
+template_confidence = 0.85      # Template matching threshold
+ocr_confidence = 0.6            # OCR detection threshold
+move_duration = 0.5             # Mouse movement speed
+max_retries = 3                 # Detection retry attempts
+NUM_POSTS = 10                  # Posts to process
 ```
 
 ## 📊 Logging
