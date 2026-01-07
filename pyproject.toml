@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cv-desktop-automation"
+version = "1.0.0"
+description = "Vision-based desktop automation using OpenCV and OCR"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "pyautogui>=0.9.54",
+    "opencv-python>=4.8.0",
+    "pytesseract>=0.3.10",
+    "pillow>=9.0.0",
+    "requests>=2.31.0",
+    "numpy>=1.24.0",
+    "pygetwindow>=0.0.9",
+    "tqdm>=4.65.0",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/cv-desktop-automation"
+Repository = "https://github.com/yourusername/cv-desktop-automation"
+
+[project.scripts]
+cv-automate = "src.main:main"

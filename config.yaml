@@ -1,0 +1,74 @@
+# Configuration File for CV Desktop Automation
+
+# Detection Settings
+detection:
+  template_confidence: 0.85      # Template matching confidence threshold (0.0-1.0)
+  ocr_confidence: 0.6            # OCR detection confidence threshold (0.0-1.0)
+  max_retries: 3                 # Maximum detection retry attempts
+  retry_delay: 1.0               # Delay between retries in seconds
+  target_name: "Notepad"         # Target icon name for OCR fallback
+
+# Automation Settings
+automation:
+  move_duration: 0.5             # Mouse movement duration in seconds
+  type_interval: 0.01            # Typing interval per character in seconds
+  window_timeout: 5              # Window detection timeout in seconds
+  double_click_interval: 0.25    # Interval between clicks in double-click
+
+# API Settings
+api:
+  base_url: "https://jsonplaceholder.typicode.com/posts"
+  timeout: 10                    # Request timeout in seconds
+  num_posts: 10                  # Number of posts to fetch and process
+
+# Output Settings
+output:
+  base_dir: "~/Desktop/cv-project/tjm"  # Output directory (~ expands to home)
+  save_debug_screenshots: true          # Save annotated detection screenshots
+  save_ocr_candidates: true             # Save OCR candidate images for debugging
+
+# Logging Settings
+logging:
+  log_file: "automation.log"            # Log file name
+  console_level: "INFO"                 # Console log level (DEBUG, INFO, WARNING, ERROR)
+  file_level: "DEBUG"                   # File log level (DEBUG, INFO, WARNING, ERROR)
+
+# Screen Settings
+screen:
+  width: 1920                           # Screen width in pixels
+  height: 1080                          # Screen height in pixels
+
+# Template Matching Settings
+template_matching:
+  scales:                               # Scale factors for multi-scale search
+    - 0.5
+    - 0.7
+    - 0.8
+    - 0.9
+    - 1.0
+    - 1.1
+    - 1.2
+    - 1.3
+    - 1.5
+    - 1.8
+    - 2.0
+    - 2.5
+  method: "TM_CCOEFF_NORMED"           # OpenCV template matching method
+
+# OCR Settings
+ocr:
+  psm_mode: 11                          # Tesseract PSM mode (11 = sparse text)
+  oem_mode: 3                           # Tesseract OEM mode (3 = default)
+  preprocessing:
+    bilateral_filter:
+      d: 9
+      sigma_color: 75
+      sigma_space: 75
+    clahe:
+      clip_limit: 2.0
+      tile_grid_size: [8, 8]
+
+# Safety Settings
+safety:
+  enable_failsafe: true                 # Enable PyAutoGUI failsafe (move to corner to abort)
+  pause_between_actions: 0.1            # Pause between PyAutoGUI actions
