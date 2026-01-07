@@ -68,6 +68,30 @@ class AutomationController:
             logger.debug("Double-clicking icon")
             pyautogui.doubleClick(interval=0.25)
             
+            # Move mouse away to avoid obstructing view for next iteration
+            screen_width, screen_height = self.get_screen_size()
+            mid_x = screen_width // 2
+            mid_y = screen_height // 2
+            
+            # Determine which quadrant and calculate new position
+            new_x = icon_x
+            new_y = icon_y
+            
+            if icon_x < mid_x:  # Left half
+                new_x = icon_x + 150
+            else:  # Right half
+                new_x = icon_x - 150
+            
+            if icon_y < mid_y:  # Upper half
+                new_y = icon_y + 150
+            else:  # Lower half
+                new_y = icon_y - 150
+            
+            logger.debug(f"Moving mouse away to ({new_x}, {new_y})")
+            pyautogui.moveTo(new_x, new_y, duration=0.2)
+            time.sleep(0.1) #new here
+            pyautogui.click()  # Click to clear any hover effects, new here
+            
             # Wait for window to appear
             logger.debug("Waiting for Notepad window...")
             if self._wait_for_window("Notepad", timeout=self.window_timeout):
