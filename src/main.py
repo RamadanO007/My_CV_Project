@@ -170,7 +170,7 @@ class AutomationWorkflow:
             # Initialize automation controller
             self.controller = AutomationController(
                 move_duration=0.5,
-                type_interval=0.01,
+                type_interval=0.1, 
                 window_timeout=5
             )
             
