@@ -159,15 +159,10 @@ Desktop/cv-project/tjm/
 ### Sample Post File Content
 
 ```
-Post ID: 1
-User ID: 1
-Title: sunt aut facere repellat provident occaecati excepturi optio reprehenderit
-============================================================
-
-quia et suscipit
-suscipit recusandae consequuntur expedita et cum
-reprehenderit molestiae ut ut quas totam
-nostrum rerum est autem sunt rem eveniet architecto
+Title:sunt cere repellat ident caecati cepturi  rehenderit
+a uscipit
+uscipit usandae uuntur rehenderit rum m t rem veniet chitecto
+n
 ```
 
 ## 🔧 Configuration
