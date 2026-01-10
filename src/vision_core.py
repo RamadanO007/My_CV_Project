@@ -11,7 +11,6 @@ from .utils import (
     capture_screenshot,
     validate_coordinates,
     calculate_text_similarity,
-    estimate_icon_position,
     annotate_detection,
     save_annotated_image
 )
@@ -115,7 +114,7 @@ class IconDetector:
             if self.template is None:
                 logger.error(f"Failed to load template: {self.template_path}")
                 return False
-            
+            #Makes the template gray
             self.template_gray = cv2.cvtColor(self.template, cv2.COLOR_BGR2GRAY)
             
             logger.info(f"Template loaded: {self.template_path}")
@@ -160,10 +159,13 @@ class IconDetector:
                         top_confidence = candidates[0]['confidence']
                         
                         # ALWAYS verify if we have multiple candidates and top confidence is very high (0.91-1.0)
+
                         # This catches cases like Notepad vs Notepad++ with identical icons
                         force_ocr_check = top_confidence >= 0.91
                         
                         # Check if top candidates are within 0.1 confidence of each other
+                        #VIP PART!!!!!!!!!!!!!
+                        #Imposter check
                         ambiguous_candidates = [
                             c for c in candidates 
                             if abs(c['confidence'] - top_confidence) < 0.1
@@ -322,9 +324,11 @@ class IconDetector:
                 # Track absolute best for fallback
                 _, max_val, _, max_loc = cv2.minMaxLoc(result)
                 
+                #VIP PART!!!!!!!!!!!!!
+                #Case 1: Single Match (Raw Template Score)
                 # Track best match
                 if max_val > best_confidence:
-                    best_confidence = max_val
+                    best_confidence = max_val #raw open cv template score
                     best_scale = scale
                     best_location = max_loc
                     best_match = (new_w, new_h)
@@ -498,10 +502,14 @@ class IconDetector:
                 
                 # Score this candidate: template confidence + text match - distance penalty
                 if closest_text and min_distance < 200:  # Must be reasonably close
+
                     # Normalize distance (closer is better)
                     distance_score = max(0, 1 - (min_distance / 200))
                     
                     # Combined score: 40% template, 40% text similarity, 20% proximity
+                    #VIP PART!!!!!!!!!!!!!
+                    #Imposter fallback check
+                    #Case 3: Combined Score (Template + OCR + Proximity)
                     combined_score = (
                         candidate['confidence'] * 0.4 +
                         closest_text['similarity'] * 0.4 +
@@ -620,6 +628,8 @@ class IconDetector:
                     
                     # Combined score: 90% similarity, 10% OCR confidence
                     # (text matching is more important than OCR confidence)
+                    #VIP PART!!!!!!!!!!!!!
+                    #Case 2: No Visual Match (OCR Fallback Score)
                     combined_score = (similarity * 0.9) + (conf / 100.0 * 0.1)
                     
                     candidates.append({

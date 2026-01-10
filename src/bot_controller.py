@@ -89,7 +89,7 @@ class AutomationController:
             
             logger.debug(f"Moving mouse away to ({new_x}, {new_y})")
             pyautogui.moveTo(new_x, new_y, duration=0.2)
-            time.sleep(0.1) #new here
+            time.sleep(0.07) #experimental
             pyautogui.click()  # Click to clear any hover effects, new here
             
             # Wait for window to appear

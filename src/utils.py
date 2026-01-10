@@ -207,7 +207,7 @@ def validate_coordinates(
     return valid
 
 
-def calculate_text_similarity(detected_text: str, target: str = "Notepad") -> float:
+def calculate_text_similarity(detected_text: str, target: str = "Notepad") -> float: #VIP PART!!!!!!!!!!!!!
     """
     Calculate similarity score between detected text and target.
     
@@ -242,11 +242,11 @@ def calculate_text_similarity(detected_text: str, target: str = "Notepad") -> fl
         next_char_idx = len(target_lower)
         if next_char_idx < len(text_lower):
             next_char = text_lower[next_char_idx]
-            # If next char is NOT a space/separator, it's likely a different app
+            # If next char is NOT a space/separator, it's likely a different app, so we reduce score
             # (e.g., "Notepad++" should not match "Notepad")
             if next_char not in (' ', '\t', '\n'):
-                # Weak match for extended names
-                length_ratio = len(target_lower) / len(text_lower)
+                # Weak match for extended names 
+                length_ratio = len(target_lower) / len(text_lower) 
                 return 0.3 + (0.1 * length_ratio)
         
         # Word boundary exists or target is at end - strong match
@@ -352,34 +352,3 @@ def load_image(image_path: Path) -> Optional[np.ndarray]:
     except Exception as e:
         logger.error(f"Error loading image {image_path}: {e}")
         return None
-
-
-def estimate_icon_position(
-    text_x: int,
-    text_y: int,
-    text_width: int,
-    text_height: int,
-    icon_offset: int = 60
-) -> Tuple[int, int]:
-    """
-    Estimate icon center position from text label position.
-    
-    Desktop icons typically appear above their text labels.
-    
-    Args:
-        text_x: Text bounding box x coordinate
-        text_y: Text bounding box y coordinate
-        text_width: Text bounding box width
-        text_height: Text bounding box height
-        icon_offset: Typical vertical offset from text to icon center
-        
-    Returns:
-        Tuple[int, int]: Estimated (icon_x, icon_y) coordinates
-    """
-    # Icon is centered horizontally with text
-    icon_x = text_x + text_width // 2
-    
-    # Icon is above text, typically 60px
-    icon_y = text_y - max(text_height * 3, icon_offset) // 2
-    
-    return icon_x, icon_y
