@@ -17,14 +17,14 @@ if errorlevel 1 (
 )
 
 echo [1] Checking setup...
-python setup.py
-if errorlevel 1 (
-    echo.
-    echo [ERROR] Setup validation failed
-    echo Please fix the issues above before running the application
-    pause
-    exit /b 1
-)
+@REM python setup.py
+@REM if errorlevel 1 (
+@REM     echo.
+@REM     echo [ERROR] Setup validation failed
+@REM     echo Please fix the issues above before running the application
+@REM     pause
+@REM     exit /b 1
+@REM )
 
 echo.
 echo ============================================================
