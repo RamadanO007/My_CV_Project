@@ -349,8 +349,8 @@ def main():
     OUTPUT_DIR = OUTPUT_BASE
     
     # Number of posts to process
-    NUM_POSTS = 2  # Testing with 2 posts (change back to 10 when ready)
-    # NUM_POSTS = 10
+    # NUM_POSTS = 3  # Testing with 3 posts (change back to 10)
+    NUM_POSTS = 10
 
     # Setup logging
     LOG_FILE = PROJECT_ROOT / "automation.log"
