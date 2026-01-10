@@ -85,7 +85,9 @@ class AutomationWorkflow:
             # Step 0: Minimize all windows to show desktop
             logger.info("Minimizing all windows to show desktop...")
             pyautogui.hotkey('win', 'd')
-            time.sleep(2)  # Wait for desktop to appear
+            time.sleep(0.5)
+            pyautogui.click()  # Click to ensure desktop is focused
+            time.sleep(1.5)  # Wait for desktop to appear
             logger.info("✓ Desktop visible\n")
             
             # Step 1: Initialize components
@@ -283,7 +285,9 @@ class AutomationWorkflow:
             # Step 6: Show desktop again for next post (minimize all windows)
             logger.debug("Showing desktop for next icon detection...")
             pyautogui.hotkey('win', 'd')
-            time.sleep(1.0)  # Wait for desktop to appear
+            time.sleep(0.5)
+            pyautogui.click()  # Click to ensure desktop is focused
+            time.sleep(0.5)  # Wait for desktop to appear
             
             return True
             
