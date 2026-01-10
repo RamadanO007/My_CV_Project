@@ -7,7 +7,7 @@ name = "cv-desktop-automation"
 version = "1.0.0"
 description = "Vision-based desktop automation using OpenCV and OCR"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Ramadan O", email = "omaryasser5922@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.8"
@@ -31,8 +31,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/cv-desktop-automation"
-Repository = "https://github.com/yourusername/cv-desktop-automation"
+Homepage = "https://github.com/RamadanO007"
+Repository = "https://github.com/RamadanO007/My_CV_Project"
 
 [project.scripts]
 cv-automate = "src.main:main"

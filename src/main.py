@@ -346,7 +346,8 @@ def main():
     
     # Number of posts to process
     NUM_POSTS = 2  # Testing with 2 posts (change back to 10 when ready)
-    
+    # NUM_POSTS = 10
+
     # Setup logging
     LOG_FILE = PROJECT_ROOT / "automation.log"
     setup_logging(str(LOG_FILE))

@@ -1,4 +1,8 @@
 # Configuration File for CV Desktop Automation
+# This is just a place holder for future improvements
+# its currently being unused
+#the actual values are hard coded into the main.py
+
 
 # Detection Settings
 detection:
