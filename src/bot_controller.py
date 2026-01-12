@@ -62,7 +62,7 @@ class AutomationController:
             # Move mouse to icon
             logger.debug(f"Moving mouse to ({icon_x}, {icon_y})")
             pyautogui.moveTo(icon_x, icon_y, duration=self.move_duration)
-            time.sleep(0.3)  # Wait for movement to complete
+            time.sleep(0.2)  # Reduced from 0.3s
             
             # Double-click
             logger.debug("Double-clicking icon")
@@ -94,7 +94,7 @@ class AutomationController:
             
             # Wait for window to appear
             logger.debug("Waiting for Notepad window...")
-            if self._wait_for_window("Notepad", timeout=self.window_timeout):
+            if self._wait_for_window("Notepad", timeout=3):  # Reduced from 5s to 3s
                 logger.info("✓ Notepad launched successfully")
                 return True
             else:
@@ -128,15 +128,15 @@ class AutomationController:
                 logger.error("Notepad window not active")
                 return False
             
-            time.sleep(0.3)
+            time.sleep(0.2)  # Reduced from 0.3s
             
             # Clear existing content
             if clear_first:
                 logger.debug("Clearing existing content (Ctrl+A, Delete)")
                 pyautogui.hotkey('ctrl', 'a')
-                time.sleep(0.2)
+                time.sleep(0.1)  # Reduced from 0.2s
                 pyautogui.press('delete')
-                time.sleep(0.2)
+                time.sleep(0.1)  # Reduced from 0.2s
             
             # Type content
             logger.debug("Typing content...")
@@ -180,16 +180,16 @@ class AutomationController:
                 logger.error("Notepad window not active")
                 return False
             
-            time.sleep(0.3)
+            time.sleep(0.2)  # Reduced from 0.3s
             
             # Open Save As dialog (Ctrl+Shift+S or Ctrl+S)
             logger.debug("Opening Save As dialog (Ctrl+Shift+S)")
             pyautogui.hotkey('ctrl', 'shift', 's')
-            time.sleep(1.0)  # Wait for dialog to fully load
+            time.sleep(0.6)  # Reduced from 1.0s to 0.6s
             
             # Clear any existing text in filename field
             pyautogui.hotkey('ctrl', 'a')
-            time.sleep(0.2)
+            time.sleep(0.1)  # Reduced from 0.2s
             
             # Type full file path with quotes (helps with spaces)
             filepath_str = str(filepath.absolute())
@@ -198,19 +198,19 @@ class AutomationController:
             # Type path character by character for reliability
             for char in filepath_str:
                 pyautogui.press(char)
-                time.sleep(0.02)
+                time.sleep(0.01)  # Reduced from 0.02s
             
-            time.sleep(0.5)
+            time.sleep(0.3)  # Reduced from 0.5s
             
             # Press Enter to save
             logger.debug("Pressing Enter to save")
             pyautogui.press('enter')
-            time.sleep(1.0)  # Wait longer for file operation
+            time.sleep(0.5)  # Reduced from 1.0s to 0.5s
             
             # Handle overwrite confirmation if needed
             if handle_overwrite:
                 logger.debug("Checking for overwrite confirmation dialog")
-                time.sleep(0.3)
+                time.sleep(0.2)  # Reduced from 0.3s
                 
                 # Look for various possible confirmation window titles
                 confirm_titles = ["Confirm Save As", "Save As", "Replace", "Notepad"]
@@ -224,28 +224,28 @@ class AutomationController:
                 
                 if confirmation_found:
                     logger.debug("Overwrite confirmation detected, selecting Yes")
-                    time.sleep(0.3)
+                    time.sleep(0.2)  # Reduced from 0.3s
                     # Press left arrow to ensure "Yes" is selected, then Enter
                     pyautogui.press('left')
-                    time.sleep(0.2)
+                    time.sleep(0.1)  # Reduced from 0.2s
                     pyautogui.press('enter')
-                    time.sleep(0.5)
+                    time.sleep(0.3)  # Reduced from 0.5s
                 else:
                     # Try pressing enter anyway in case dialog exists but title didn't match
                     pyautogui.press('enter')
                     time.sleep(0.3)
             
             # Verify file was saved (check multiple times)
-            for attempt in range(3):
-                time.sleep(0.5)
+            for attempt in range(2):  # Reduced from 3 to 2 attempts
+                time.sleep(0.3)  # Reduced from 0.5s
                 if filepath.exists():
                     logger.info(f"✓ File saved successfully: {filepath}")
                     # Click to clear any dialogs or focus issues
-                    time.sleep(0.2)
+                    time.sleep(0.1)  # Reduced from 0.2s
                     pyautogui.click()
                     logger.debug("Clicked after save")
                     return True
-                logger.debug(f"Verification attempt {attempt + 1}/3: File not found yet")
+                logger.debug(f"Verification attempt {attempt + 1}/2: File not found yet")
             
             logger.warning(f"File not found after save attempt: {filepath}")
             logger.warning(f"Directory exists: {filepath.parent.exists()}")
@@ -283,12 +283,12 @@ class AutomationController:
             # Activate first Notepad window
             notepad_window = notepad_windows[0]
             notepad_window.activate()
-            time.sleep(0.3)
+            time.sleep(0.2)  # Reduced from 0.3s
             
             # Close window (Alt+F4)
             logger.debug("Sending Alt+F4 to close window")
             pyautogui.hotkey('alt', 'F4')
-            time.sleep(1.0)  # Increased wait for close/prompt dialog
+            time.sleep(0.5)  # Reduced from 1.0s to 0.5s
             
             # Handle save changes prompt if appears
             # Check for actual save prompt dialog, not just any Notepad window

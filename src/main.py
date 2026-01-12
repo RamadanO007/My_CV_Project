@@ -85,9 +85,9 @@ class AutomationWorkflow:
             # Step 0: Minimize all windows to show desktop
             logger.info("Minimizing all windows to show desktop...")
             pyautogui.hotkey('win', 'd')
-            time.sleep(0.5)
+            time.sleep(0.3)  # Reduced from 0.5s
             pyautogui.click()  # Click to ensure desktop is focused
-            time.sleep(1.5)  # Wait for desktop to appear
+            time.sleep(0.7)  # Reduced from 1.5s to 0.7s
             logger.info("✓ Desktop visible\n")
             
             # Step 1: Initialize components
@@ -129,7 +129,7 @@ class AutomationWorkflow:
                 
                 # Small delay between posts
                 if idx < len(posts):
-                    time.sleep(2)
+                    time.sleep(0.5)  # Reduced from 2s to 0.5s
             
             # Step 6: Cleanup
             self._cleanup()
@@ -246,7 +246,7 @@ class AutomationWorkflow:
                 return False
             
             logger.info("✓ Notepad launched")
-            time.sleep(1)  # Wait for window to fully load
+            time.sleep(0.5)  # Reduced from 1s to 0.5s
             
             # Step 3: Type content
             logger.info("Step 3: Typing post content...")
@@ -258,7 +258,7 @@ class AutomationWorkflow:
                 return False
             
             logger.info("✓ Content typed")
-            time.sleep(0.5)
+            time.sleep(0.3)  # Reduced from 0.5s
             
             # Step 4: Save file
             logger.info("Step 4: Saving file...")
@@ -272,7 +272,7 @@ class AutomationWorkflow:
                 return False
             
             logger.info(f"✓ File saved: {filepath}")
-            time.sleep(0.5)
+            time.sleep(0.3)  # Reduced from 0.5s
             
             # Step 5: Close Notepad
             logger.info("Step 5: Closing Notepad...")
@@ -285,9 +285,9 @@ class AutomationWorkflow:
             # Step 6: Show desktop again for next post (minimize all windows)
             logger.debug("Showing desktop for next icon detection...")
             pyautogui.hotkey('win', 'd')
-            time.sleep(0.5)
+            time.sleep(0.3)  # Reduced from 0.5s
             pyautogui.click()  # Click to ensure desktop is focused
-            time.sleep(0.5)  # Wait for desktop to appear
+            time.sleep(0.3)  # Reduced from 0.5s
             
             return True
             

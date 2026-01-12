@@ -88,9 +88,8 @@ class IconDetector:
         self.retry_delay = retry_delay
         
         # Multi-scale search parameters
-        # Optimized for 46x54 template - covers 32px to 138px icon sizes
-        # Includes smaller scales for different DPI/icon size settings
-        self.scales = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.8, 2.0, 2.5, 3.0]
+        # Reduced scales for better performance (covers most common icon sizes)
+        self.scales = [0.8, 1.0, 1.2, 1.5, 2.0]  # Reduced from 12 to 5 scales
         
         # Load template
         self.template = None
